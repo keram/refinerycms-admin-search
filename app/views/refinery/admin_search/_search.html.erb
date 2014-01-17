@@ -1,0 +1,22 @@
+<form class="search_form" action="<%= url %>" data-remote="true" >
+  <div class="field">
+    <%= search_field nil, nil,
+                name: :search,
+                value: params[:search],
+                pattern: '.{3,}',
+                autofocus: true,
+                title: t('search_input_notice', scope: 'refinery.admin.search') %>
+
+    <input type="image" src="<%= asset_url('refinery/icons/zoom.png'); %>">
+
+    <a title="Toggle search options" href="#search-options" class="nojs-hide icon-small toggle-icon toggle-hide">Search options</a>
+
+    <a href="<%= url %>"
+      class="<%= 'hide' if params[:search].blank? %> icon-small reset-icon">Cancel search</a>
+  </div>
+  <div class="field js-hide" id="search-options">
+    <% search_in = options_for_select(search_model::SEARCHABLE_ATTRIBUTES.collect { |a| [t(a, scope: "activerecord.attributes.#{search_model.model_name.i18n_key}"), a]}, params[:search_in]) %>
+    <%= select_tag(:search_in, search_in) %>
+  </div>
+</form>
+
