@@ -38,7 +38,8 @@ module Refinery
       str = str.to_s
       col = searchable_attributes.first if col.nil?
 
-      return all unless respond_to?("search_by_#{col}") &&
+      # make Impossible WHERE clause when search params are invalid
+      return where('1 = 2') unless respond_to?("search_by_#{col}") &&
                         str.gsub(/(%|_)/, '').length >= MIN_SEARCHABLE_STRING_LENGTH
 
       str = "#{str}%" if str =~ /[^\%\_]\z/

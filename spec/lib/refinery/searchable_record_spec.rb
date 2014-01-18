@@ -89,18 +89,18 @@ describe Refinery::SearchableRecord do
       end
 
       context 'invalid params' do
-        it 'does not include like clause to sql' do
+        it 'make impossible where' do
           # empty string
-          expect( User.search_by('').to_sql ).to eq('SELECT "users".* FROM "users"')
+          expect( User.search_by('').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE (1 = 2)')
 
           # too short string
-          expect( User.search_by('a').to_sql ).to eq('SELECT "users".* FROM "users"')
+          expect( User.search_by('a').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE (1 = 2)')
 
           # nil and more complex query
-          expect( User.where(id: 1).search_by(nil).order(id: :desc).to_sql ).to eq('SELECT "users".* FROM "users"  WHERE "users"."id" = 1  ORDER BY "users"."id" DESC')
+          expect( User.where(id: 1).search_by(nil).order(id: :desc).to_sql ).to eq('SELECT "users".* FROM "users"  WHERE "users"."id" = 1 AND (1 = 2)  ORDER BY "users"."id" DESC')
 
           # not existing searchable attribute
-          expect( User.search_by('test', 'not_existing_attr').to_sql ).to eq('SELECT "users".* FROM "users"')
+          expect( User.search_by('test', 'not_existing_attr').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE (1 = 2)')
         end
       end
 
