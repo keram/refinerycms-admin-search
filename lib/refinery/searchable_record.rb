@@ -21,7 +21,9 @@ module Refinery
       localized_searchable_attributes.each do |atr|
         self.class.class_eval do
           define_method :"search_by_#{atr}" do |str|
-            joins(:translations).where( translation_class.arel_table[atr].matches(str) )
+            joins(:translations).
+            where( translation_class.arel_table[:locale].eq(::Globalize.locale) ).
+            where( translation_class.arel_table[atr].matches(str) )
           end
         end
       end

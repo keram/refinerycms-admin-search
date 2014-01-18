@@ -145,9 +145,7 @@ describe Refinery::SearchableRecord do
       end
 
       it 'include like clause to sql' do
-        expect( Post.search_by('lorem', 'email').to_sql ).to eq('SELECT "posts".* FROM "posts"  WHERE ("posts"."email" LIKE \'lorem%\')')
-
-        expect( Post.search_by('test', 'title').to_sql ).to eq('SELECT "posts".* FROM "posts" INNER JOIN "post_translations" ON "post_translations"."post_id" = "posts"."id" WHERE ("post_translations"."title" LIKE \'test%\')')
+        expect( Post.search_by('test', 'title').to_sql ).to eq('SELECT "posts".* FROM "posts" INNER JOIN "post_translations" ON "post_translations"."post_id" = "posts"."id" WHERE "post_translations"."locale" = \'en\' AND ("post_translations"."title" LIKE \'test%\')')
       end
     end
   end
