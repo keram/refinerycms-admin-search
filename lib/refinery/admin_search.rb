@@ -13,7 +13,7 @@ module Refinery
       engine_name :refinery_admin_search
 
       def search_form_partial_path
-        'refinery/admin_search/search'
+        'refinery/admin/search/form'
       end
 
       initializer "register refinery_admin_search engine" do

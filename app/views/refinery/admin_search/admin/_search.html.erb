@@ -1,7 +1,0 @@
-<form method="GET" action="<%= url %>" class="search_form">
-  <%= text_field :search, nil,
-              id: 'search', type: 'search', name: 'search',
-              value: params[:search],
-              title: t('search_input_notice', scope: 'refinery.admin.search') %>
-  <%= submit_tag t('button_text', scope: 'refinery.admin.search'), name: nil %>
-</form>
