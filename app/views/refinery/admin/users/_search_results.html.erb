@@ -1,0 +1,5 @@
+<% if @users.any? %>
+  <%= render 'users' %>
+<% else %>
+  <%= render 'refinery/admin/search/no_results' %>
+<% end %>
