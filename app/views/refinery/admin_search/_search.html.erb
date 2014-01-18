@@ -15,7 +15,7 @@
       class="<%= 'hide' if params[:search].blank? %> icon-small reset-icon">Cancel search</a>
   </div>
   <div class="field js-hide" id="search-options">
-    <% search_in = options_for_select(search_model::SEARCHABLE_ATTRIBUTES.collect { |a| [t(a, scope: "activerecord.attributes.#{search_model.model_name.i18n_key}"), a]}, params[:search_in]) %>
+    <% search_in = options_for_select(search_model.searchable_attributes.collect { |a| [t(a, scope: "activerecord.attributes.#{search_model.model_name.i18n_key}"), a]}, params[:search_in]) %>
     <%= select_tag(:search_in, search_in) %>
   </div>
 </form>
