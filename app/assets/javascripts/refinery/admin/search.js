@@ -12,24 +12,17 @@
 
         module: 'admin',
 
-        search: function () {
+        search: function (str) {
             var that = this,
                 form = that.holder,
-                data = form.serializeArray();
+                url = form.attr('action');
 
-            that.searching = true;
+            if (str.length > 0) {
+                url += (/\?/.test(url) ? '&' : '?' ) + $.param(form.serializeArray());
+            }
 
             form.find(':input').prop('disabled', true);
-
-            $.ajax(form.attr('action'), {
-                'data': data
-            }).done(function (response, status, xhr) {
-               form.trigger('ajax:success', [response, status, xhr]);
-            }).fail(function () {
-                form.find(':input').prop('disabled', false);
-            }).always(function () {
-                that.searching = false;
-            });
+            Turbolinks.visit(url);
         },
 
         focus: function (elm) {
@@ -49,9 +42,8 @@
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (!that.searching &&
-                    input.length > 0 && input.val().length >= 3) {
-                    that.search();
+                if (input.length > 0) {
+                    that.search(input.val());
                 }
             });
         },
