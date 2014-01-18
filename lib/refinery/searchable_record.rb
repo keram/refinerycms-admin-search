@@ -37,7 +37,7 @@ module Refinery
       col = searchable_attributes.first if col.nil?
 
       return all unless respond_to?("search_by_#{col}") &&
-                        str.gsub(/(%|_)/, '').length > MIN_SEARCHABLE_STRING_LENGTH
+                        str.gsub(/(%|_)/, '').length >= MIN_SEARCHABLE_STRING_LENGTH
 
       str = "#{str}%" if str =~ /[^\%\_]\z/
       send "search_by_#{col}", str
