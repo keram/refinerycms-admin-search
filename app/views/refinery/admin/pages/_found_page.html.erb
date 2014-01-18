@@ -1,0 +1,46 @@
+<li id="<%= dom_id found_page %>">
+  <div class="row">
+
+    <div class="detail">
+      <span class="title">
+        <%= found_page.title -%>
+      </span>
+      <%= page_meta_information found_page %>
+    </div>
+    <span class="actions">
+
+      <%= link_to t('delete', scope: 'refinery.admin.record'),
+                  refinery.admin_page_path(found_page.relative_path),
+                  class: 'delete confirm-delete nojs-hide icon-small delete-icon',
+                  title: t('delete', scope: 'refinery.admin.pages'),
+                  data: {
+                    remote: true,
+                    confirm: t('message',
+                      scope: 'refinery.admin.delete',
+                      title: found_page.title
+                    )
+                  },
+                  method: :delete if found_page.deletable? %>
+
+      <%= link_to t('edit', scope: 'refinery.admin.record'),
+                  refinery.edit_admin_page_url(found_page.relative_path),
+                  class: 'icon-small edit-icon',
+                  title: t('edit', scope: 'refinery.admin.pages') %>
+
+      <%= link_to t('add_child', scope: 'refinery.admin.record'),
+                  refinery.new_admin_page_path(parent_id: found_page.id),
+                  class: 'icon-small page-add-icon',
+                  title: t('new', scope: 'refinery.admin.pages') %>
+
+      <% if found_page.translation.new_record? %>
+        <%= content_tag :a, '', class: 'icon-small no-live-icon', title: t('.translation_not_exists') %>
+      <% else %>
+        <%= link_to t('live', scope: 'refinery.admin.record'),
+                    found_page.url,
+                    target: '_blank',
+                    class: 'icon-small live-icon',
+                    title: t('view_live', scope: 'refinery.admin.pages.page') %>
+      <% end %>
+    </span>
+  </div>
+</li>

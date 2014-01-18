@@ -1,0 +1,8 @@
+<% if @pages.any? %>
+  <%= will_paginate @pages %>
+  <ul class="records">
+    <%= render partial: 'found_page', collection: @pages %>
+  </ul>
+<% else %>
+  <%= render partial: 'refinery/admin/search/no_results' %>
+<% end %>
