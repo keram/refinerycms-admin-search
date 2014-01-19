@@ -1,4 +1,4 @@
-<form class="search_form" action="<%= url %>" data-remote="true" >
+<form class="search_form" action="<%= url %>" >
   <div class="field">
     <%= search_field nil, nil,
                 name: :search,
@@ -9,15 +9,24 @@
 
     <input type="image" src="<%= asset_url('refinery/icons/zoom.png'); %>">
     <% if search_model.searchable_attributes.many? %>
-      <a title="Toggle search options" href="#search-options" class="nojs-hide icon-small toggle-icon toggle-hide">Search options</a>
+      <% search_in = options_for_select(search_model.searchable_attributes.collect { |a| [t(a, scope: "activerecord.attributes.#{search_model.model_name.i18n_key}"), a]}, params[:search_in]) %>
+      <% hide_search_options = !searching? && (params[:search_in].blank? || params[:search_in] == search_model.searchable_attributes.first.to_s) %>
+      <% unless searching? %>
+        <a title="Toggle search options" href="#search-options"
+          class="nojs-hide icon-small toggle-icon toggle-hide">
+          <%= t('.search_options') %></a>
+      <% end %>
     <% end %>
 
-    <a href="<%= url %>"
-      class="<%= 'hide' if params[:search].blank? %> icon-small reset-icon">Cancel search</a>
+    <% if searching? %>
+      <a href="<%= url %>" class="icon-small reset-icon"><%= t('.cancel_search') %></a>
+    <% end %>
   </div>
   <% if search_model.searchable_attributes.many? %>
-    <div class="field js-hide" id="search-options">
-      <% search_in = options_for_select(search_model.searchable_attributes.collect { |a| [t(a, scope: "activerecord.attributes.#{search_model.model_name.i18n_key}"), a]}, params[:search_in]) %>
+    <div class="field <%= 'js-hide' if hide_search_options %>" id="search-options">
+      <label class="stripped" for="search_in">
+        <%= t('.search_in_field') %>:
+      </label>
       <%= select_tag(:search_in, search_in) %>
     </div>
   <% end %>

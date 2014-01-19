@@ -1,0 +1,12 @@
+en:
+  refinery:
+    admin:
+      search:
+        form:
+          search_in_field: Search in
+          cancel_search: Cancel
+          search_options: Options
+        not_respond: Search in specified field is not possible.
+        search_string_is_too_short: Search string is too short.
+        search_string_is_too_long: Search string is too long.
+        too_many_wildcards: 'Search string contains too many special characters like %, ^, _.'
