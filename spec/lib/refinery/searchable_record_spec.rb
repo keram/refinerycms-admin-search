@@ -76,6 +76,48 @@ describe Refinery::SearchableRecord do
     end
   end
 
+  describe 'valid_params?' do
+    it 'returns false when invalid params are present' do
+      # empty string
+      valid, reason = User.valid_search?('')
+      expect( valid ).to be_false
+      expect( reason ).to eq('search_string_is_too_short')
+
+      # too short string
+      valid, reason = User.valid_search?('a')
+      expect( valid ).to be_false
+      expect( reason ).to eq('search_string_is_too_short')
+
+      # too long string
+      valid, reason = User.valid_search?('a'*200)
+      expect( valid ).to be_false
+      expect( reason ).to eq('search_string_is_too_long')
+
+      # too many wildcards
+      valid, reason = User.valid_search?('a%b^c_*')
+      expect( valid ).to be_false
+      expect( reason ).to eq('too_many_wildcards')
+
+      # not searchable field
+      valid, reason = User.valid_search?('test', 'not_existing_attr')
+      expect( valid ).to be_false
+      expect( reason ).to eq('not_respond')
+    end
+
+    it 'returns true when valid params are present' do
+       expect( User.valid_search?('test') ).to be_true
+    end
+  end
+
+  describe 'liberalize_search' do
+    it 'met expectations' do
+      expect( User.send(:liberalize_search, 'xxx') ).to eq('%xxx%')
+      expect( User.send(:liberalize_search, '^xxx') ).to eq('xxx%')
+      expect( User.send(:liberalize_search, '^xxx^') ).to eq('xxx')
+      expect( User.send(:liberalize_search, '%xxx%') ).to eq('%xxx%')
+    end
+  end
+
   context 'simple searchable attributes' do
 
     it 'responds to search_by.. methods' do
@@ -88,35 +130,12 @@ describe Refinery::SearchableRecord do
         expect( User.search_by 'test' ).to be_kind_of(ActiveRecord::Relation)
       end
 
-      context 'invalid params' do
-        it 'make impossible where' do
-          # empty string
-          expect( User.search_by('').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE (1 = 2)')
+      it 'include like clause to sql' do
+        # default search column
+        expect( User.search_by('lorem').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE ("users"."username" LIKE \'%lorem%\')')
 
-          # too short string
-          expect( User.search_by('a').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE (1 = 2)')
-
-          # nil and more complex query
-          expect( User.where(id: 1).search_by(nil).order(id: :desc).to_sql ).to eq('SELECT "users".* FROM "users"  WHERE "users"."id" = 1 AND (1 = 2)  ORDER BY "users"."id" DESC')
-
-          # not existing searchable attribute
-          expect( User.search_by('test', 'not_existing_attr').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE (1 = 2)')
-        end
-      end
-
-      context 'valid params' do
-        it 'include like clause to sql' do
-          # default search column
-          expect( User.search_by('lorem').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE ("users"."username" LIKE \'lorem%\')')
-
-          # with custom specified search column
-          expect( User.search_by('test', 'email').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE ("users"."email" LIKE \'test%\')')
-        end
-
-        it 'does not include % at end of string if there already is % or _' do
-          expect( User.search_by('lorem%').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE ("users"."username" LIKE \'lorem%\')')
-          expect( User.search_by('lorem_').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE ("users"."username" LIKE \'lorem_\')')
-        end
+        # with custom specified search column
+        expect( User.search_by('test', 'email').to_sql ).to eq('SELECT "users".* FROM "users"  WHERE ("users"."email" LIKE \'%test%\')')
       end
     end
 
@@ -145,7 +164,7 @@ describe Refinery::SearchableRecord do
       end
 
       it 'include like clause to sql' do
-        expect( Post.search_by('test', 'title').to_sql ).to eq('SELECT "posts".* FROM "posts" INNER JOIN "post_translations" ON "post_translations"."post_id" = "posts"."id" WHERE "post_translations"."locale" = \'en\' AND ("post_translations"."title" LIKE \'test%\')')
+        expect( Post.search_by('test', 'title').to_sql ).to eq('SELECT "posts".* FROM "posts" INNER JOIN "post_translations" ON "post_translations"."post_id" = "posts"."id" WHERE "post_translations"."locale" = \'en\' AND ("post_translations"."title" LIKE \'%test%\')')
       end
     end
   end
@@ -163,7 +182,7 @@ describe Refinery::SearchableRecord do
 
       # this test does not make sense here but I included it here for reference
       it 'build correct sql query' do
-        expect( Page.search_by('lorem', 'body').to_sql ).to eq('SELECT "pages".* FROM "pages" INNER JOIN "page_parts" ON "page_parts"."page_id" = "pages"."id" INNER JOIN "page_part_translations" ON "page_part_translations"."page_part_id" = "page_parts"."id" WHERE ("page_part_translations"."body" LIKE \'lorem%\')')
+        expect( Page.search_by('lorem', 'body').to_sql ).to eq('SELECT "pages".* FROM "pages" INNER JOIN "page_parts" ON "page_parts"."page_id" = "pages"."id" INNER JOIN "page_part_translations" ON "page_part_translations"."page_part_id" = "page_parts"."id" WHERE ("page_part_translations"."body" LIKE \'%lorem%\')')
       end
     end
 

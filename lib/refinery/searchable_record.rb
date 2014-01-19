@@ -2,6 +2,10 @@ module Refinery
   module SearchableRecord
 
     MIN_SEARCHABLE_STRING_LENGTH = 3
+    MAX_SEARCHABLE_STRING_LENGTH = 128
+    SEARCH_WILDCARDS = ['%', '^', '*', '_']
+    SEARCH_WILDCARDS_RE = Regexp.new(SEARCH_WILDCARDS.map {|s| Regexp.escape(s) }.join('|'))
+    MAX_WILDCARDS = 3
 
     def acts_like_searchable(*attr_names)
       options = attr_names.extract_options!
@@ -35,15 +39,8 @@ module Refinery
     end
 
     def search_by str, col=nil
-      str = str.to_s
-      col = searchable_attributes.first if col.nil?
-
-      # make Impossible WHERE clause when search params are invalid
-      return where('1 = 2') unless respond_to?("search_by_#{col}") &&
-                        str.gsub(/(%|_)/, '').length >= MIN_SEARCHABLE_STRING_LENGTH
-
-      str = "#{str}%" if str =~ /[^\%\_]\z/
-      send "search_by_#{col}", str
+      col ||= searchable_attributes.first
+      send "search_by_#{col}", liberalize_search(str)
     end
 
     def searchable_attributes
@@ -56,6 +53,28 @@ module Refinery
 
     def nested_searchable_attributes
       @nested_searchable_attributes ||= []
+    end
+
+    def impossible_where
+      where('1 = 2')
+    end
+
+    def valid_search? str, col=nil
+      col ||= searchable_attributes.first
+      return false, 'not_respond' unless respond_to?("search_by_#{col}")
+      return false, 'search_string_is_too_short' if str.to_s.gsub(SEARCH_WILDCARDS_RE, '').length < MIN_SEARCHABLE_STRING_LENGTH
+      return false, 'search_string_is_too_long' if str.length > MAX_SEARCHABLE_STRING_LENGTH
+      return false, 'too_many_wildcards' if SEARCH_WILDCARDS.inject(0) {|a, s| a + str.count(s) } > MAX_WILDCARDS
+      true
+    end
+
+    private
+
+    def liberalize_search str
+      str = "%#{str}" unless str =~ /\A(\%|\^)/
+      str = str.sub(/\A\^/, '')
+      str = "#{str}%" unless str =~ /(\%|\^)\z/
+      str = str.sub(/\^\z/, '')
     end
 
   end
