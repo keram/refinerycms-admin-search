@@ -1,0 +1,7 @@
+<% if @resources.any? %>
+  <ul class="records">
+    <%= render partial: 'resource', collection: @resources %>
+  </ul>
+<% else %>
+  <%= render 'refinery/admin/search/no_results' %>
+<% end %>

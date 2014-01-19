@@ -1,0 +1,7 @@
+<% if @images.any? %>
+  <ul class="records">
+    <%= render partial: 'list_view_image', collection: @images %>
+  </ul>
+<% else %>
+  <%= render 'refinery/admin/search/no_results' %>
+<% end %>
