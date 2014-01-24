@@ -5,7 +5,7 @@ Refinery::AdminController.class_eval do
       records.search_by params[:search], params[:search_in]
     else
       flash.now[:error] = ::I18n.t(reason, scope: 'refinery.admin.search')
-      records.impossible_where
+      records.none
     end
   end
 end

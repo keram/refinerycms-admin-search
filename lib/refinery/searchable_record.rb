@@ -55,10 +55,6 @@ module Refinery
       @nested_searchable_attributes ||= []
     end
 
-    def impossible_where
-      where('1 = 2')
-    end
-
     def valid_search? str, col=nil
       col ||= searchable_attributes.first
       return false, 'not_respond' unless respond_to?("search_by_#{col}")
