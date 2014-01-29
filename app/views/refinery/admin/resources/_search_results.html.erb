@@ -1,7 +1,9 @@
 <% if @resources.any? %>
+  <%= will_paginate @resources %>
   <ul class="records">
     <%= render partial: 'resource', collection: @resources %>
   </ul>
+  <%= will_paginate @resources %>
 <% else %>
   <%= render 'refinery/admin/search/no_results' %>
 <% end %>

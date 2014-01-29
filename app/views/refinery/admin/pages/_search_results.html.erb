@@ -3,6 +3,7 @@
   <ul class="records">
     <%= render partial: 'found_page', collection: @pages %>
   </ul>
+  <%= will_paginate @pages %>
 <% else %>
   <%= render partial: 'refinery/admin/search/no_results' %>
 <% end %>

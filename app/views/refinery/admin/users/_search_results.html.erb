@@ -1,5 +1,9 @@
 <% if @users.any? %>
-  <%= render 'users' %>
+  <%= will_paginate @users %>
+  <ul class="records">
+    <%= render partial: 'user', collection: @users %>
+  </ul>
+  <%= will_paginate @users %>
 <% else %>
   <%= render 'refinery/admin/search/no_results' %>
 <% end %>

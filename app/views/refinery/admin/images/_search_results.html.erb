@@ -1,7 +1,9 @@
 <% if @images.any? %>
+  <%= will_paginate @images %>
   <ul class="records">
     <%= render partial: 'list_view_image', collection: @images %>
   </ul>
+  <%= will_paginate @images %>
 <% else %>
   <%= render 'refinery/admin/search/no_results' %>
 <% end %>
