@@ -1,3 +1,5 @@
+require 'decorators'
+
 module Refinery
   module AdminSearch
     class << self

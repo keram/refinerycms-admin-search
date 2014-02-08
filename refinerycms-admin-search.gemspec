@@ -14,5 +14,6 @@ Gem::Specification.new do |s|
 
   s.files             = `git ls-files -- app/* lib/*`.split("\n")
 
-  s.add_dependency    'refinerycms-core', '~> 2.718.0.dev'
+  s.add_dependency    'refinerycms-core',     '~> 2.718.0.dev'
+  s.add_dependency    'decorators',           '~> 1.0.3'
 end
